@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalogo Catene - Premium Collection</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #000000;
+            --accent-color: #432338;
+            --accent-glow: #5a2e4a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .header {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo-minerva { 
+            height: 35px; 
+            width: auto;
+        }
+        .logo-catalogo {
+            height: 45px;
+            width: auto;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .background-wrapper {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse at 20% 20%, var(--accent-color) 0%, transparent 40%),
+                radial-gradient(ellipse at 80% 80%, var(--accent-glow) 0%, transparent 40%),
+                radial-gradient(ellipse at 40% 40%, #2a1a2a 0%, transparent 50%),
+                linear-gradient(180deg, #000000 0%, #1a0f1a 100%);
+        }
+        .hero-section {
+            padding: 160px 0 60px;
+            text-align: center;
+            background: transparent;
+        }
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        .hero-subtitle {
+            font-size: 1.4rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+        .search-section { padding: 3rem 0; background: transparent; }
+        .search-container { max-width: 500px; margin: 0 auto; position: relative; }
+        .custom-dropdown { position: relative; width: 100%; }
+        .dropdown-selected {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: var(--text-primary);
+            padding: 1.2rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 400;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        .dropdown-selected:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.2); }
+        .dropdown-selected.active { border-color: var(--accent-color); box-shadow: 0 4px 20px rgba(67, 35, 56, 0.3), 0 0 0 2px rgba(67, 35, 56, 0.1); }
+        .dropdown-arrow { transition: transform 0.3s ease; color: var(--text-secondary); }
+        .dropdown-arrow.active { transform: rotate(180deg); color: var(--accent-color); }
+        .dropdown-options {
+            position: absolute;
+            top: 100%; left: 0; right: 0;
+            background: rgba(26, 15, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            margin-top: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .dropdown-options.active { opacity: 1; visibility: visible; transform: translateY(0); }
+        .dropdown-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+        .dropdown-option:last-child { border-bottom: none; }
+        .dropdown-option:hover { background: linear-gradient(135deg, var(--accent-color), var(--accent-glow)); color: white; }
+        .dropdown-options::-webkit-scrollbar { width: 6px; }
+        .dropdown-options::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 3px; }
+        .dropdown-options::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 3px; }
+        .dropdown-options::-webkit-scrollbar-thumb:hover { background: var(--accent-glow); }
+        .card-gruppo {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+        .card-gruppo::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 30%, var(--accent-color) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, var(--accent-glow) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+            filter: blur(20px);
+        }
+        .card-gruppo:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: var(--accent-color);
+            box-shadow: 
+                0 20px 40px rgba(67, 35, 56, 0.4),
+                0 0 0 1px rgba(67, 35, 56, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        .card-gruppo:hover::before { opacity: 0.6; }
+        .gruppo-icon { font-size: 2.8rem; margin-bottom: 1.5rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); opacity: 0.9; }
+        .card-title { font-size: 1.3rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1.5rem; line-height: 1.3; }
+        .gruppi-section { padding: 40px 0 80px; position: relative; background: transparent; }
+        @media (max-width: 768px) {
+            .hero-section { padding: 140px 0 40px; }
+            .hero-title { font-size: 2.5rem; padding: 0 1rem; }
+            .hero-subtitle { font-size: 1.2rem; }
+            .card-gruppo { padding: 1.5rem; }
+            .gruppo-icon { font-size: 2.2rem; }
+            .header { padding: 0.8rem 1rem; }
+            .logo-minerva { height: 28px; }
+            .logo-catalogo { height: 35px; }
+            .dropdown-selected { padding: 1rem 1.2rem; font-size: 0.95rem; }
+        }
+        @media (max-width: 480px) { 
+            .hero-title { font-size: 2rem; }
+            .hero-subtitle { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <img src="MinervaHub_LOGO_white.png" alt="MinervaHub - Partner of Excellence" class="logo-minerva">
+        <img src="logo_catalogo.png" alt="Catalogo Catene" class="logo-catalogo">
+        <div style="width: 35px;"></div>
+    </header>
+    <div class="background-wrapper"></div>
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">Esplora il nostro catalogo.</h1>
+            <p class="hero-subtitle">Scopri oltre 2000 modelli tra design classici ed innovativi per pelletteria, bijoux e calzatura.</p>
+        </div>
+    </section>
+    <section class="search-section">
+        <div class="container">
+            <div class="search-container">
+                <div class="custom-dropdown" id="customDropdown">
+                    <div class="dropdown-selected" id="dropdownSelected">
+                        <span id="selectedText">Cerca una categoria...</span>
+                        <span class="dropdown-arrow">⌄</span>
+                    </div>
+                    <div class="dropdown-options" id="dropdownOptions">
+                        <div class="dropdown-option" data-value="grumetta">Grumetta</div>
+                        <div class="dropdown-option" data-value="forzatina">Forzatina</div>
+                        <div class="dropdown-option" data-value="catena-a-pallina">Catena a pallina</div>
+                        <div class="dropdown-option" data-value="bismark">Bismark</div>
+                        <div class="dropdown-option" data-value="bizzantina">Bizzantina</div>
+                        <div class="dropdown-option" data-value="cestina">Cestina</div>
+                        <div class="dropdown-option" data-value="cobra">Cobra</div>
+                        <div class="dropdown-option" data-value="coda-di-topo">Coda di topo</div>
+                        <div class="dropdown-option" data-value="coda-di-volpe">Coda di volpe</div>
+                        <div class="dropdown-option" data-value="corda">Corda</div>
+                        <div class="dropdown-option" data-value="fantasia">Fantasia</div>
+                        <div class="dropdown-option" data-value="grappolo">Grappolo</div>
+                        <div class="dropdown-option" data-value="pisa">Pisa</div>
+                        <div class="dropdown-option" data-value="rolo">Rolò</div>
+                        <div class="dropdown-option" data-value="spiga">Spiga</div>
+                        <div class="dropdown-option" data-value="tessuto">Tessuto</div>
+                        <div class="dropdown-option" data-value="tubo-gas">Tubo gas</div>
+                        <div class="dropdown-option" data-value="catena-a-strass">Catena a strass</div>
+                        <div class="dropdown-option" data-value="veneziana">Veneziana</div>
+                        <div class="dropdown-option" data-value="chiusure">Chiusure</div>
+                        <div class="dropdown-option" data-value="maglie">Maglie</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="gruppi-section">
+        <div class="container">
+            <div class="row g-4" id="gruppi-container"></div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // CSV DATA LOADER (identico)
+        class CSVDataLoader {
+            constructor() {
+                this.prodotti = [];
+                this.categorie = new Set();
+            }
+
+            async caricaCSV() {
+                try {
+                    const response = await fetch('./data/catalogo_zetacatene_web.csv');
+                    if (!response.ok) throw new Error(`CSV non trovato: ${response.status}`);
+                    const csvText = await response.text();
+                    this.prodotti = this.parseCSV(csvText);
+                    this.estraiCategorie();
+                    return this.prodotti;
+                } catch {
+                    return this.caricaDatiEsempio();
+                }
+            }
+
+            parseCSV(csvText) {
+                const lines = csvText.split('\n').filter(l => l.trim());
+                const headers = lines[0].split(',');
+                const prodotti = [];
+                for (let i = 1; i < lines.length; i++) {
+                    const values = lines[i].split(',');
+                    const p = {};
+                    headers.forEach((h, j) => p[h] = values[j]);
+                    prodotti.push({ normalizzato: { categoria: p['Testo41'] || '' } });
+                }
+                return prodotti;
+            }
+
+            caricaDatiEsempio() { return []; }
+            estraiCategorie() {}
+            getConteggioCategorie() { return {}; }
+        }
+
+        const gruppi = [
+            { id: 1, nome: "Grumetta", icon: "🔗" },
+            { id: 2, nome: "Forzatina", icon: "⛓️" },
+            { id: 3, nome: "Catena a pallina", icon: "⚪" },
+            { id: 4, nome: "Bismark", icon: "🛡️" },
+            { id: 5, nome: "Bizzantina", icon: "🏛️" },
+            { id: 6, nome: "Cestina", icon: "🧺" },
+            { id: 7, nome: "Cobra", icon: "🐍" },
+            { id: 8, nome: "Coda di topo", icon: "🐭" },
+            { id: 9, nome: "Coda di volpe", icon: "🦊" },
+            { id: 10, nome: "Corda", icon: "🪢" },
+            { id: 11, nome: "Fantasia", icon: "✨" },
+            { id: 12, nome: "Grappolo", icon: "🍇" },
+            { id: 13, nome: "Pisa", icon: "🔸" },
+            { id: 14, nome: "Rolò", icon: "🔘" },
+            { id: 15, nome: "Spiga", icon: "🌾" },
+            { id: 16, nome: "Tessuto", icon: "🧵" },
+            { id: 17, nome: "Tubo gas", icon: "⛽" },
+            { id: 18, nome: "Catena a strass", icon: "💎" },
+            { id: 19, nome: "Veneziana", icon: "🏙️" },
+            { id: 20, nome: "Chiusure", icon: "🔒" },
+            { id: 21, nome: "Maglie", icon: "🔄" }
+        ];
+
+        // FUNZIONI INTERATTIVE (identiche, tranne rimozione count)
+        const dropdownSelected = document.getElementById('dropdownSelected');
+        const selectedText = document.getElementById('selectedText');
+        const dropdownOptions = document.getElementById('dropdownOptions');
+        const dropdownArrow = document.querySelector('.dropdown-arrow');
+
+        dropdownSelected.addEventListener('click', () => {
+            dropdownOptions.classList.toggle('active');
+            dropdownSelected.classList.toggle('active');
+            dropdownArrow.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.custom-dropdown')) {
+                dropdownOptions.classList.remove('active');
+                dropdownSelected.classList.remove('active');
+                dropdownArrow.classList.remove('active');
+            }
+        });
+
+        document.querySelectorAll('.dropdown-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const val = this.getAttribute('data-value');
+                selectedText.textContent = this.textContent;
+                dropdownOptions.classList.remove('active');
+                dropdownSelected.classList.remove('active');
+                dropdownArrow.classList.remove('active');
+                scrollToGruppo(val);
+            });
+        });
+
+        function creaCardGruppo(gruppo) {
+    const nomeFile = gruppo.nome
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/ /g, "_");
+
+    return `
+        <div class="col-md-6 col-lg-4 col-xl-3" id="gruppo-${gruppo.id}">
+            <div class="card-gruppo" onclick="apriGruppo(${gruppo.id})" 
+                 style="overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 0;">
+                
+                <div style="padding: 3px;">
+                    <img src="./immaginini_home/${nomeFile}.jpg"
+                     onerror="this.onerror=null;this.src='./immaginini_home/${nomeFile}.png';"
+                     alt="${gruppo.nome}"
+                     style="
+                        width: 100%;
+                        height: 200px;
+                        object-fit: cover;
+                        display: block;
+                        border-top-left-radius: 16px;
+                        border-top-right-radius: 16px;
+                        border-bottom-left-radius: 16px;
+                        border-bottom-right-radius: 16px;
+                        border-radius: 12px;
+                        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+                    ">
+                </div>
+                <div class="card-body text-center d-flex flex-column justify-content-center" 
+                     style="flex-grow: 1; padding: 1.5rem;">
+                    <h5 class="card-title" style="margin: 0;">${gruppo.nome}</h5>
+                </div>
+            </div>
+        </div>
+    `;
+}
+        function caricaGruppi() {
+            document.getElementById('gruppi-container').innerHTML = gruppi.map(g => creaCardGruppo(g)).join('');
+        }
+
+        function scrollToGruppo(nome) {
+            const g = gruppi.find(x => x.nome.toLowerCase().replace(/ /g, '-') === nome);
+            if (g) {
+                const el = document.getElementById(`gruppo-${g.id}`);
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.style.animation = 'highlight 2s ease';
+                setTimeout(() => el.style.animation = '', 2000);
+            }
+        }
+
+        function apriGruppo(id) {
+            const g = gruppi.find(x => x.id === id);
+            window.location.href = `gruppo.html?id=${id}&nome=${encodeURIComponent(g.nome)}`;
+        }
+
+        const style = document.createElement('style');
+        style.textContent = `@keyframes highlight { 0%{transform:scale(1);}50%{transform:scale(1.05);}100%{transform:scale(1);} }`;
+        document.head.appendChild(style);
+
+        document.addEventListener('DOMContentLoaded', () => caricaGruppi());
+    </script>
+</body>
+</html>
