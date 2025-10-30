@@ -1,309 +1,531 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catalogo Catene - Premium Collection</title>
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-    <style>
-        :root {
-            --primary-bg: #000000;
-            --accent-color: #432338;
-            --accent-glow: #5a2e4a;
-            --text-primary: #ffffff;
-            --text-secondary: #b0b0b0;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: var(--primary-bg);
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        .header {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%;
-            padding: 1rem 2rem;
-            z-index: 1000;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .logo-minerva { height: 35px; width: auto; }
-        .logo-catalogo {
-            height: 45px;
-            width: auto;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .background-wrapper {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -1;
-            background: 
-                radial-gradient(ellipse at 20% 20%, var(--accent-color) 0%, transparent 40%),
-                radial-gradient(ellipse at 80% 80%, var(--accent-glow) 0%, transparent 40%),
-                radial-gradient(ellipse at 40% 40%, #2a1a2a 0%, transparent 50%),
-                linear-gradient(180deg, #000000 0%, #1a0f1a 100%);
-        }
-        .hero-section { padding: 140px 0 40px; text-align: center; }
-        .hero-title { font-size: 2.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; }
-        .hero-subtitle { font-size: 1.1rem; color: var(--text-secondary); }
-        .filters-section { padding: 2rem 0; }
-        .filter-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1rem;
-        }
-        .custom-dropdown { position: relative; width: 180px; }
-        .dropdown-selected {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            color: var(--text-primary);
-            padding: 1rem 1.2rem;
-            font-size: 0.9rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .dropdown-selected:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255,255,255,0.2); }
-        .dropdown-arrow { transition: transform 0.3s ease; color: var(--text-secondary); }
-        .dropdown-arrow.active { transform: rotate(180deg); color: var(--accent-color); }
-        .dropdown-options {
-            position: absolute;
-            top: 100%; left: 0; right: 0;
-            background: rgba(26,15,26,0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 12px;
-            margin-top: 8px;
-            max-height: 300px;
-            overflow-y: auto;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-        .dropdown-options.active { opacity: 1; visibility: visible; transform: translateY(0); }
-        .dropdown-option {
-            padding: 12px 16px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            cursor: pointer;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-        }
-        .dropdown-option:hover { background: linear-gradient(135deg, var(--accent-color), var(--accent-glow)); color: white; }
-        .prodotti-section { padding: 2rem 0 4rem; }
-        .card-prodotto {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-            height: 100%;
-            backdrop-filter: blur(20px);
-        }
-        .card-prodotto:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-color);
-            box-shadow: 0 10px 30px rgba(67,35,56,0.3);
-        }
-        .back-button {
-            position: fixed;
-            bottom: 2rem;
-            left: 2rem;
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 0.8rem 1.5rem;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-        .back-button:hover { background: var(--accent-glow); transform: translateY(-2px); }
-        /* ✅ Fix responsive header su mobile */
-@media (max-width: 768px) {
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catalogo Catene - Premium Collection</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <style>
+    :root {
+      --primary-bg: #000;
+      --accent-color: #432338;
+      --accent-glow: #5a2e4a;
+      --text-primary: #fff;
+      --text-secondary: #b0b0b0;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: var(--primary-bg);
+      color: var(--text-primary);
+      font-family: "Inter", sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
     .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 1rem 2rem;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo-minerva {
+      height: 35px;
+      width: auto;
+    }
+    .logo-catalogo {
+      height: 45px;
+      width: auto;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    @media (max-width: 768px) {
+      .header {
         flex-direction: column;
         justify-content: center;
         align-items: center;
         gap: 0.6rem;
         padding: 1rem;
-    }
-
-    .logo-minerva,
-    .logo-catalogo {
+      }
+      .logo-minerva,
+      .logo-catalogo {
         position: static;
         transform: none;
+      }
+      .logo-minerva {
         height: 35px;
-    }
-
-    .logo-catalogo {
+      }
+      .logo-catalogo {
         height: 40px;
+      }
     }
-}
-    </style>
+    .background-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: radial-gradient(
+          ellipse at 20% 20%,
+          var(--accent-color) 0%,
+          transparent 40%
+        ),
+        radial-gradient(
+          ellipse at 80% 80%,
+          var(--accent-glow) 0%,
+          transparent 40%
+        ),
+        radial-gradient(ellipse at 40% 40%, #2a1a2a 0%, transparent 50%),
+        linear-gradient(180deg, #000 0%, #1a0f1a 100%);
+    }
+    .hero-section {
+      padding: 140px 0 40px;
+      text-align: center;
+    }
+    .hero-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .hero-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+    }
+    .filters-section {
+      padding: 2rem 0;
+    }
+    .filter-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .custom-dropdown {
+      position: relative;
+      width: 180px;
+    }
+    .dropdown-selected {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      color: var(--text-primary);
+      padding: 1rem 1.2rem;
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .dropdown-selected:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .dropdown-arrow {
+      transition: transform 0.3s ease;
+      color: var(--text-secondary);
+    }
+    .dropdown-arrow.active {
+      transform: rotate(180deg);
+      color: var(--accent-color);
+    }
+    .dropdown-options {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: rgba(26, 15, 26, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      margin-top: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    .dropdown-options.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .dropdown-option {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+    .dropdown-option:hover {
+      background: linear-gradient(135deg, var(--accent-color), var(--accent-glow));
+      color: white;
+    }
+    .prodotti-section {
+      padding: 2rem 0 4rem;
+    }
+    .card-prodotto {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      height: 100%;
+      backdrop-filter: blur(20px);
+    }
+    .card-prodotto:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent-color);
+      box-shadow: 0 10px 30px rgba(67, 35, 56, 0.3);
+    }
+    .prodotto-image {
+      width: 100%;
+      height: 120px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      font-size: 2rem;
+    }
+    .prodotto-codice {
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+    }
+    .prodotto-descrizione {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+    .prodotto-specifiche {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.8rem;
+    }
+    .back-button {
+      position: fixed;
+      bottom: 2rem;
+      left: 2rem;
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 0.8rem 1.5rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    .back-button:hover {
+      background: var(--accent-glow);
+      transform: translateY(-2px);
+    }
+  </style>
 </head>
 
 <body>
-    <header class="header">
-        <img src="MinervaHub_LOGO_white.png" class="logo-minerva" alt="MinervaHub">
-        <img src="logo_catalogo.png" class="logo-catalogo" alt="Catalogo Catene">
-        <div style="width: 35px;"></div>
-    </header>
+  <header class="header">
+    <img src="MinervaHub_LOGO_white.png" class="logo-minerva" alt="MinervaHub" />
+    <img src="logo_catalogo.png" class="logo-catalogo" alt="Catalogo Catene" />
+    <div style="width: 35px"></div>
+  </header>
 
-    <div class="background-wrapper"></div>
+  <div class="background-wrapper"></div>
 
-    <section class="hero-section">
-        <div class="container">
-            <h1 class="hero-title" id="gruppoNome">Caricamento...</h1>
-            <p class="hero-subtitle" id="contatoreProdotti">0 prodotti trovati</p>
+  <section class="hero-section">
+    <div class="container">
+      <h1 class="hero-title" id="gruppoNome">Caricamento...</h1>
+      <p class="hero-subtitle" id="contatoreProdotti">0 prodotti trovati</p>
+    </div>
+  </section>
+
+  <section class="filters-section">
+    <div class="container">
+      <div class="filter-container">
+        <div class="custom-dropdown" id="dropdownAspetto">
+          <div class="dropdown-selected">
+            <span class="selected-text">Aspetto</span
+            ><span class="dropdown-arrow">⌄</span>
+          </div>
+          <div class="dropdown-options"></div>
         </div>
-    </section>
-
-    <section class="filters-section">
-        <div class="container">
-            <div class="filter-container">
-                <div class="custom-dropdown" id="dropdownAspetto">
-                    <div class="dropdown-selected"><span class="selected-text">Aspetto</span><span class="dropdown-arrow">⌄</span></div>
-                    <div class="dropdown-options"></div>
-                </div>
-                <div class="custom-dropdown" id="dropdownFilo">
-                    <div class="dropdown-selected"><span class="selected-text">Filo</span><span class="dropdown-arrow">⌄</span></div>
-                    <div class="dropdown-options"></div>
-                </div>
-                <div class="custom-dropdown" id="dropdownInternoFilo">
-                    <div class="dropdown-selected"><span class="selected-text">Interno Filo</span><span class="dropdown-arrow">⌄</span></div>
-                    <div class="dropdown-options"></div>
-                </div>
-                <div class="custom-dropdown" id="dropdownMateriale">
-                    <div class="dropdown-selected"><span class="selected-text">Materiale</span><span class="dropdown-arrow">⌄</span></div>
-                    <div class="dropdown-options"></div>
-                </div>
-                <div class="custom-dropdown" id="dropdownDimFilo">
-                    <div class="dropdown-selected"><span class="selected-text">Dim. Filo</span><span class="dropdown-arrow">⌄</span></div>
-                    <div class="dropdown-options"></div>
-                </div>
-                <input type="text" id="searchInput" placeholder="Cerca per codice..." style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:1rem 1.2rem;color:white;font-size:0.9rem;width:220px;">
-            </div>
+        <div class="custom-dropdown" id="dropdownFilo">
+          <div class="dropdown-selected">
+            <span class="selected-text">Filo</span
+            ><span class="dropdown-arrow">⌄</span>
+          </div>
+          <div class="dropdown-options"></div>
         </div>
-    </section>
-
-    <section class="prodotti-section">
-        <div class="container">
-            <div class="row g-3" id="prodotti-container"></div>
+        <div class="custom-dropdown" id="dropdownInternoFilo">
+          <div class="dropdown-selected">
+            <span class="selected-text">Interno Filo</span
+            ><span class="dropdown-arrow">⌄</span>
+          </div>
+          <div class="dropdown-options"></div>
         </div>
-    </section>
+        <div class="custom-dropdown" id="dropdownMateriale">
+          <div class="dropdown-selected">
+            <span class="selected-text">Materiale</span
+            ><span class="dropdown-arrow">⌄</span>
+          </div>
+          <div class="dropdown-options"></div>
+        </div>
+        <div class="custom-dropdown" id="dropdownDimFilo">
+          <div class="dropdown-selected">
+            <span class="selected-text">Dim. Filo</span
+            ><span class="dropdown-arrow">⌄</span>
+          </div>
+          <div class="dropdown-options"></div>
+        </div>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Cerca per codice..."
+          style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 1rem 1.2rem; color: white; font-size: 0.9rem; width: 220px;"
+        />
+      </div>
+    </div>
+  </section>
 
-    <button class="back-button" onclick="tornaIndietro()">← Torna al catalogo</button>
+  <section class="prodotti-section">
+    <div class="container">
+      <div class="row g-3" id="prodotti-container"></div>
+    </div>
+  </section>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="js/data-loader.js"></script>
+  <button class="back-button" onclick="tornaIndietro()">← Torna al catalogo</button>
 
-<script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/data-loader.js"></script>
+  <script>
     let prodottiReali = [];
     const dataLoader = new CSVDataLoader();
 
+    function inizializzaDropdown() {
+      document.querySelectorAll(".custom-dropdown").forEach((dropdown) => {
+        const selected = dropdown.querySelector(".dropdown-selected");
+        const options = dropdown.querySelector(".dropdown-options");
+        const arrow = dropdown.querySelector(".dropdown-arrow");
+
+        selected.addEventListener("click", (e) => {
+          e.stopPropagation();
+          options.classList.toggle("active");
+          arrow.classList.toggle("active");
+        });
+
+        options.querySelectorAll(".dropdown-option").forEach((opt) => {
+          opt.addEventListener("click", () => {
+            const value = opt.getAttribute("data-value");
+            const text = opt.textContent;
+            dropdown.setAttribute("data-value", value);
+            dropdown.querySelector(".selected-text").textContent = text;
+            options.classList.remove("active");
+            arrow.classList.remove("active");
+            applicaFiltri();
+          });
+        });
+      });
+
+      document.addEventListener("click", () => {
+        document
+          .querySelectorAll(".dropdown-options")
+          .forEach((opt) => opt.classList.remove("active"));
+        document
+          .querySelectorAll(".dropdown-arrow")
+          .forEach((ar) => ar.classList.remove("active"));
+      });
+    }
+
+    function popolaDropdown(dropdownId, valori) {
+      const dropdown = document.getElementById(dropdownId);
+      const container = dropdown.querySelector(".dropdown-options");
+      container.innerHTML = "";
+      const unici = [
+        ...new Set(valori.map((v) => (v || "").trim().toLowerCase())),
+      ]
+        .filter((v) => v !== "")
+        .map((v) => v.charAt(0).toUpperCase() + v.slice(1));
+      unici.forEach((valore) => {
+        const opt = document.createElement("div");
+        opt.className = "dropdown-option";
+        opt.dataset.value = valore;
+        opt.textContent = valore;
+        container.appendChild(opt);
+      });
+    }
+
+    function popolaFiltriConDatiReali() {
+      popolaDropdown("dropdownAspetto", dataLoader.getAspettiUnici());
+      popolaDropdown("dropdownFilo", dataLoader.getFiliUnici());
+      popolaDropdown("dropdownInternoFilo", dataLoader.getInterniFiloUnici());
+      popolaDropdown("dropdownMateriale", dataLoader.getMaterialiUnici());
+      popolaDropdown("dropdownDimFilo", dataLoader.getSpessoriUnici());
+      inizializzaDropdown();
+    }
+
     function getFiltriAttivi() {
-        return {
-            ricerca: document.getElementById('searchInput')?.value.trim().toLowerCase() || ''
-        };
+      return {
+        aspetto:
+          document.getElementById("dropdownAspetto")?.getAttribute("data-value") ||
+          "",
+        filo:
+          document.getElementById("dropdownFilo")?.getAttribute("data-value") ||
+          "",
+        internoFilo:
+          document
+            .getElementById("dropdownInternoFilo")
+            ?.getAttribute("data-value") || "",
+        materiale:
+          document
+            .getElementById("dropdownMateriale")
+            ?.getAttribute("data-value") || "",
+        dimFilo:
+          document
+            .getElementById("dropdownDimFilo")
+            ?.getAttribute("data-value") || "",
+        ricerca:
+          document
+            .getElementById("searchInput")
+            ?.value.trim()
+            .toLowerCase() || "",
+      };
     }
 
     function applicaFiltri() {
-        const f = getFiltriAttivi();
-        const filtrati = prodottiReali.filter(p => {
-            const n = p.normalizzato;
-            return !f.ricerca || (n.codice && n.codice.toLowerCase().includes(f.ricerca));
-        });
-        renderizzaProdotti(filtrati);
+      const f = getFiltriAttivi();
+      const filtrati = prodottiReali.filter((p) => {
+        const n = p.normalizzato;
+        return (
+          (!f.aspetto || n.aspetto.toLowerCase() === f.aspetto.toLowerCase()) &&
+          (!f.filo || n.filo.toLowerCase() === f.filo.toLowerCase()) &&
+          (!f.internoFilo ||
+            n.internoFilo.toLowerCase() === f.internoFilo.toLowerCase()) &&
+          (!f.materiale ||
+            n.materiale.toLowerCase() === f.materiale.toLowerCase()) &&
+          (!f.dimFilo || n.spessore.toLowerCase() === f.dimFilo.toLowerCase()) &&
+          (!f.ricerca ||
+            (n.codice && n.codice.toLowerCase().includes(f.ricerca)))
+        );
+      });
+      renderizzaProdotti(filtrati);
     }
 
     function renderizzaProdotti(prodotti) {
-        const container = document.getElementById('prodotti-container');
-        const contatore = document.getElementById('contatoreProdotti');
+      const container = document.getElementById("prodotti-container");
+      const contatore = document.getElementById("contatoreProdotti");
+      contatore.textContent = `${prodotti.length} prodotti trovati`;
 
-        contatore.textContent = `${prodotti.length} prodotti trovati`;
+      if (prodotti.length === 0) {
+        container.innerHTML = `
+          <div class="col-12 text-center">
+            <p style="color: var(--text-secondary);">Nessun prodotto trovato con i filtri selezionati</p>
+          </div>`;
+        return;
+      }
 
-        if (prodotti.length === 0) {
-            container.innerHTML = `
-                <div class="col-12 text-center">
-                    <p style="color: var(--text-secondary);">Nessun prodotto trovato con i filtri selezionati</p>
-                </div>
-            `;
-            return;
-        }
-
-        container.innerHTML = prodotti.map(prodotto => `
-            <div class="col-md-6 col-lg-4 col-xl-3">
-                <div class="card-prodotto">
-                    <div class="prodotto-image">
-                        <img 
-                            src="${prodotto.normalizzato.percorsoImmagine || 'img/placeholder.jpg'}" 
-                            alt="${prodotto.normalizzato.codice}" 
-                            style="width:100%; height:120px; object-fit:cover; border-radius:8px;">
-                    </div>
-                    <div class="prodotto-codice" style="color:#ffffff; font-weight:700;">
-                        ${prodotto.normalizzato.senzaCodice ? "(senza codice)" : prodotto.normalizzato.codice}
-                    </div>
-                    <div class="prodotto-descrizione" style="color:var(--text-secondary); font-size:0.85rem;">
-                        ${prodotto.normalizzato.descrizione || ''}
-                    </div>
-                    <div class="prodotto-specifiche">
-                        <div><strong>Aspetto:</strong> ${prodotto.normalizzato.aspetto || '-'}</div>
-                        <div><strong>Materiale:</strong> ${prodotto.normalizzato.materiale || '-'}</div>
-                        <div><strong>Filo:</strong> ${prodotto.normalizzato.filo || '-'}</div>
-                        <div><strong>Interno Filo:</strong> ${prodotto.normalizzato.internoFilo || '-'}</div>
-                        <div><strong>Dim. Filo:</strong> ${prodotto.normalizzato.spessore || '-'}</div>
-                        <div><strong>Peso:</strong> ${prodotto.normalizzato.peso || '-'}g</div>
-                    </div>
-                </div>
+      container.innerHTML = prodotti
+        .map(
+          (prodotto) => `
+        <div class="col-md-6 col-lg-4 col-xl-3">
+          <div class="card-prodotto">
+            <div class="prodotto-image">
+              <img src="${
+                prodotto.normalizzato.percorsoImmagine || "img/placeholder.jpg"
+              }" alt="${prodotto.normalizzato.codice}" style="width:100%; height:120px; object-fit:cover; border-radius:8px;">
             </div>
-        `).join('');
+            <div class="prodotto-codice" style="color:#fff; font-weight:700;">
+              ${
+                prodotto.normalizzato.senzaCodice
+                  ? "(senza codice)"
+                  : prodotto.normalizzato.codice
+              }
+            </div>
+            <div class="prodotto-descrizione" style="color:var(--text-secondary); font-size:0.85rem;">
+              ${prodotto.normalizzato.descrizione || ""}
+            </div>
+            <div class="prodotto-specifiche">
+              <div><strong>Aspetto:</strong> ${
+                prodotto.normalizzato.aspetto || "-"
+              }</div>
+              <div><strong>Materiale:</strong> ${
+                prodotto.normalizzato.materiale || "-"
+              }</div>
+              <div><strong>Filo:</strong> ${
+                prodotto.normalizzato.filo
+              }</div>
+              <div><strong>Interno Filo:</strong> ${
+                prodotto.normalizzato.internoFilo || "-"
+              }</div>
+              <div><strong>Dim. Filo:</strong> ${
+                prodotto.normalizzato.spessore || "-"
+              }</div>
+              <div><strong>Peso:</strong> ${
+                prodotto.normalizzato.peso || "-"
+              } g</div>
+            </div>
+          </div>
+        </div>`
+        )
+        .join("");
     }
 
     async function caricaDatiGruppo() {
-        const params = new URLSearchParams(window.location.search);
-        const nome = params.get('nome');
-        document.getElementById('gruppoNome').textContent = nome;
-        document.title = `Catalogo ${nome} - Premium Collection`;
+      const params = new URLSearchParams(window.location.search);
+      const nome = params.get("nome");
+      document.getElementById("gruppoNome").textContent = nome;
+      document.title = `Catalogo ${nome} - Premium Collection`;
 
-        // 🔹 Nascondi barra di ricerca solo per la categoria "Chiusure"
-        if (nome && nome.trim().toLowerCase() === "chiusure") {
-            const searchInput = document.getElementById("searchInput");
-            if (searchInput) searchInput.style.display = "none";
-        }
+      // 👇 Nascondi la barra di ricerca se la categoria è "Chiusure"
+      if (nome && nome.trim().toLowerCase() === "chiusure") {
+        const searchInput = document.getElementById("searchInput");
+        if (searchInput) searchInput.style.display = "none";
+      }
 
-        await dataLoader.caricaCSV();
-        prodottiReali = dataLoader.getProdottiPerCategoria(nome);
-        renderizzaProdotti(prodottiReali);
+      await dataLoader.caricaCSV();
+      prodottiReali = dataLoader.getProdottiPerCategoria(nome);
+      renderizzaProdotti(prodottiReali);
+      popolaFiltriConDatiReali();
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        caricaDatiGruppo();
-        document.getElementById('searchInput')?.addEventListener('input', applicaFiltri);
+    document.addEventListener("DOMContentLoaded", () => {
+      caricaDatiGruppo();
+      document
+        .getElementById("searchInput")
+        ?.addEventListener("input", applicaFiltri);
     });
 
-    function tornaIndietro() { window.location.href = 'index.html'; }
-</script>
+    function tornaIndietro() {
+      window.location.href = "index.html";
+    }
+  </script>
 </body>
 </html>
