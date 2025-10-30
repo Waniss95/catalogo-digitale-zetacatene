@@ -188,6 +188,27 @@
             .hero-title { font-size: 2rem; }
             .hero-subtitle { font-size: 1.1rem; }
         }
+        /* ✅ Fix responsive header su mobile */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 1rem;
+    }
+
+    .logo-minerva,
+    .logo-catalogo {
+        position: static;
+        transform: none;
+        height: 35px;
+    }
+
+    .logo-catalogo {
+        height: 40px;
+    }
+}
     </style>
 </head>
 <body>

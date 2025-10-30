@@ -7,7 +7,6 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- ✅ Aggiunta libreria PapaParse per leggere CSV complessi -->
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <style>
         :root {
@@ -57,10 +56,7 @@
                 radial-gradient(ellipse at 40% 40%, #2a1a2a 0%, transparent 50%),
                 linear-gradient(180deg, #000000 0%, #1a0f1a 100%);
         }
-        .hero-section {
-            padding: 140px 0 40px;
-            text-align: center;
-        }
+        .hero-section { padding: 140px 0 40px; text-align: center; }
         .hero-title { font-size: 2.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; }
         .hero-subtitle { font-size: 1.1rem; color: var(--text-secondary); }
         .filters-section { padding: 2rem 0; }
@@ -129,20 +125,6 @@
             border-color: var(--accent-color);
             box-shadow: 0 10px 30px rgba(67,35,56,0.3);
         }
-        .prodotto-image {
-            width: 100%;
-            height: 120px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1rem;
-            font-size: 2rem;
-        }
-        .prodotto-codice { color: #fff; font-weight: 700; font-size: 0.85rem; margin-bottom: 0.5rem; }
-        .prodotto-descrizione { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4; }
-        .prodotto-specifiche { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.8rem; }
         .back-button {
             position: fixed;
             bottom: 2rem;
@@ -158,6 +140,27 @@
             z-index: 1000;
         }
         .back-button:hover { background: var(--accent-glow); transform: translateY(-2px); }
+        /* ✅ Fix responsive header su mobile */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 1rem;
+    }
+
+    .logo-minerva,
+    .logo-catalogo {
+        position: static;
+        transform: none;
+        height: 35px;
+    }
+
+    .logo-catalogo {
+        height: 40px;
+    }
+}
     </style>
 </head>
 
@@ -214,79 +217,93 @@
     <button class="back-button" onclick="tornaIndietro()">← Torna al catalogo</button>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- ✅ Il tuo nuovo data loader -->
-    <script src="js/data-loader.js"></script>
+<script src="js/data-loader.js"></script>
 
-    <script>
-        let prodottiReali = [];
-        const dataLoader = new CSVDataLoader();
+<script>
+    let prodottiReali = [];
+    const dataLoader = new CSVDataLoader();
 
-        function renderizzaProdotti(prodotti) {
-            const container = document.getElementById('prodotti-container');
-            const contatore = document.getElementById('contatoreProdotti');
-
-            contatore.textContent = `${prodotti.length} prodotti trovati`;
-
-            if (prodotti.length === 0) {
-                container.innerHTML = `
-                    <div class="col-12 text-center">
-                        <p style="color: var(--text-secondary);">Nessun prodotto trovato con i filtri selezionati</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = prodotti.map(prodotto => `
-                <div class="col-md-6 col-lg-4 col-xl-3">
-                    <div class="card-prodotto">
-                        <div class="prodotto-image">
-                            <img 
-                                src="${prodotto.normalizzato.percorsoImmagine || 'img/placeholder.jpg'}" 
-                                alt="${prodotto.normalizzato.codice}" 
-                                style="width:100%; height:120px; object-fit:cover; border-radius:8px;">
-                        </div>
-                        <div class="prodotto-codice" style="color:#ffffff; font-weight:700;">
-                            ${prodotto.normalizzato.senzaCodice ? "(senza codice)" : prodotto.normalizzato.codice}
-                        </div>
-                        <div class="prodotto-descrizione" style="color:var(--text-secondary); font-size:0.85rem;">
-                            ${prodotto.normalizzato.descrizione || ''}
-                        </div>
-                        <div class="prodotto-specifiche">
-                            <div><strong>Aspetto:</strong> ${prodotto.normalizzato.aspetto || '-'}</div>
-                            <div><strong>Materiale:</strong> ${prodotto.normalizzato.materiale || '-'}</div>
-                            <div><strong>Filo:</strong> ${prodotto.normalizzato.filo || '-'}</div>
-                            <div><strong>Interno Filo:</strong> ${prodotto.normalizzato.internoFilo || '-'}</div>
-                            <div><strong>Dim. Filo:</strong> ${prodotto.normalizzato.spessore || '-'}</div>
-                            <div><strong>Peso:</strong> ${prodotto.normalizzato.peso || '-'}g</div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        async function caricaDatiGruppo() {
-    const params = new URLSearchParams(window.location.search);
-    const nome = params.get('nome');
-    document.getElementById('gruppoNome').textContent = nome;
-    document.title = `Catalogo ${nome} - Premium Collection`;
-
-    // 👇 Nascondi la barra di ricerca se la categoria è "Chiusure"
-    if (nome && nome.trim().toLowerCase() === "chiusure") {
-        const searchInput = document.getElementById("searchInput");
-        if (searchInput) searchInput.style.display = "none";
+    function getFiltriAttivi() {
+        return {
+            ricerca: document.getElementById('searchInput')?.value.trim().toLowerCase() || ''
+        };
     }
 
-    await dataLoader.caricaCSV();
-    prodottiReali = dataLoader.getProdottiPerCategoria(nome);
-    renderizzaProdotti(prodottiReali);
-}
-
-
-        document.addEventListener('DOMContentLoaded', () => {
-            caricaDatiGruppo();
+    function applicaFiltri() {
+        const f = getFiltriAttivi();
+        const filtrati = prodottiReali.filter(p => {
+            const n = p.normalizzato;
+            return !f.ricerca || (n.codice && n.codice.toLowerCase().includes(f.ricerca));
         });
+        renderizzaProdotti(filtrati);
+    }
 
-        function tornaIndietro() { window.location.href = 'index.html'; }
-    </script>
+    function renderizzaProdotti(prodotti) {
+        const container = document.getElementById('prodotti-container');
+        const contatore = document.getElementById('contatoreProdotti');
+
+        contatore.textContent = `${prodotti.length} prodotti trovati`;
+
+        if (prodotti.length === 0) {
+            container.innerHTML = `
+                <div class="col-12 text-center">
+                    <p style="color: var(--text-secondary);">Nessun prodotto trovato con i filtri selezionati</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = prodotti.map(prodotto => `
+            <div class="col-md-6 col-lg-4 col-xl-3">
+                <div class="card-prodotto">
+                    <div class="prodotto-image">
+                        <img 
+                            src="${prodotto.normalizzato.percorsoImmagine || 'img/placeholder.jpg'}" 
+                            alt="${prodotto.normalizzato.codice}" 
+                            style="width:100%; height:120px; object-fit:cover; border-radius:8px;">
+                    </div>
+                    <div class="prodotto-codice" style="color:#ffffff; font-weight:700;">
+                        ${prodotto.normalizzato.senzaCodice ? "(senza codice)" : prodotto.normalizzato.codice}
+                    </div>
+                    <div class="prodotto-descrizione" style="color:var(--text-secondary); font-size:0.85rem;">
+                        ${prodotto.normalizzato.descrizione || ''}
+                    </div>
+                    <div class="prodotto-specifiche">
+                        <div><strong>Aspetto:</strong> ${prodotto.normalizzato.aspetto || '-'}</div>
+                        <div><strong>Materiale:</strong> ${prodotto.normalizzato.materiale || '-'}</div>
+                        <div><strong>Filo:</strong> ${prodotto.normalizzato.filo || '-'}</div>
+                        <div><strong>Interno Filo:</strong> ${prodotto.normalizzato.internoFilo || '-'}</div>
+                        <div><strong>Dim. Filo:</strong> ${prodotto.normalizzato.spessore || '-'}</div>
+                        <div><strong>Peso:</strong> ${prodotto.normalizzato.peso || '-'}g</div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function caricaDatiGruppo() {
+        const params = new URLSearchParams(window.location.search);
+        const nome = params.get('nome');
+        document.getElementById('gruppoNome').textContent = nome;
+        document.title = `Catalogo ${nome} - Premium Collection`;
+
+        // 🔹 Nascondi barra di ricerca solo per la categoria "Chiusure"
+        if (nome && nome.trim().toLowerCase() === "chiusure") {
+            const searchInput = document.getElementById("searchInput");
+            if (searchInput) searchInput.style.display = "none";
+        }
+
+        await dataLoader.caricaCSV();
+        prodottiReali = dataLoader.getProdottiPerCategoria(nome);
+        renderizzaProdotti(prodottiReali);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        caricaDatiGruppo();
+        document.getElementById('searchInput')?.addEventListener('input', applicaFiltri);
+    });
+
+    function tornaIndietro() { window.location.href = 'index.html'; }
+</script>
 </body>
 </html>
