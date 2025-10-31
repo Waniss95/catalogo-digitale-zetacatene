@@ -57,6 +57,7 @@ class CSVDataLoader {
                 .replace(/[\u0300-\u036f]/g, "") // togli accenti
                 .replace(/^[\uFEFF\s]+|[\s]+$/g, "") // togli BOM/spazi strani
                 .trim();
+    const codiceReacto = (p["CODICE_REACTO"] || "").trim();
 
         // NB: categoria abbassata a minuscolo per confronto
         return {
@@ -69,8 +70,10 @@ class CSVDataLoader {
             peso: normalizza(p["Peso (g)"]),
             descrizione: normalizza(p["Descrizione"]),
             codice: normalizza(p["Codice prodotto"]),
-            percorsoImmagine: (p["Percorso"] || "").replaceAll("\\\\", "/")
-        };
+            percorsoImmagine: codiceReacto
+        ? `img/prodotti/${codiceReacto}.jpg`
+        : "img/placeholder.jpg"
+};
     }
 
     // --- ESTRAE CATEGORIE UNICHE ---
