@@ -110,7 +110,40 @@
       border-color: var(--accent-color);
       box-shadow: 0 10px 30px rgba(67,35,56,0.3);
     }
-    .prodotto-image { height: 120px; margin-bottom: 1rem; }
+
+    /* ✅ MIGLIORIA: contenitore immagini con fallback elegante */
+    .prodotto-image {
+      height: 120px;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .prodotto-image img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      display: block;
+    }
+    .img-fallback {
+      width: 100%;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.75);
+      font-size: 0.85rem;
+      letter-spacing: 0.2px;
+      text-align: center;
+      padding: 0 10px;
+      background: rgba(255,255,255,0.04);
+    }
+
     .prodotto-codice { font-weight: 700; margin-bottom: 0.5rem; }
     .prodotto-descrizione { color: var(--text-secondary); font-size: 0.85rem; }
     .prodotto-specifiche { font-size: 0.8rem; color: var(--text-secondary); }
@@ -119,22 +152,46 @@
     .modal-overlay {
       position: fixed; top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0,0,0,0.75);
-      backdrop-filter: blur(5px);
+      /* ✅ più scuro + più blur (leggibilità mobile) */
+      background: rgba(0,0,0,0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       display: none; align-items: center; justify-content: center;
       z-index: 9999;
+      padding: 16px; /* ✅ evita che tocchi i bordi su mobile */
     }
     .modal-content {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.22);
       border-radius: 20px;
-      padding: 20px; max-width: 90%; width: 420px;
+      padding: 20px;
+      max-width: 90%;
+      width: 420px;
       animation: zoomIn 0.25s ease;
+    }
+    @keyframes zoomIn {
+      from { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }
     .modal-content img {
       width: 100%; border-radius: 12px; margin-bottom: 15px;
       cursor: zoom-in;
+      display: block;
     }
+
+    /* ✅ fallback elegante anche nel modal */
+    .modal-img-wrap {
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.06);
+      margin-bottom: 15px;
+    }
+    .modal-img-wrap .img-fallback {
+      height: 220px;
+      border-radius: 12px;
+    }
+
     .modal-close {
       margin-top: 10px; cursor: pointer;
       text-align: center; font-weight: 600;
@@ -266,6 +323,7 @@
   <div class="fullscreen-viewer" id="fullscreenViewer" onclick="chiudiFullscreen()">
     <img id="fullscreenImage" src="">
   </div>
+
 <script src="js/data-loader.js"></script>
 <script>
   let prodottiReali = [];
@@ -347,7 +405,6 @@
     renderizzaProdotti(prodottiReali.filter(p => {
       const n = p.normalizzato;
 
-      // ⭐️ NUOVO: check lavorazioni (OR)
       const passaLavorazione =
         !f.lavorazione ||
         (n.lavorazioni && n.lavorazioni.toLowerCase().includes(f.lavorazione.toLowerCase()));
@@ -376,6 +433,22 @@
     document.getElementById("fullscreenViewer").style.display = "none";
   }
 
+  /* ✅ helper: fallback immagine elegante */
+  function imgFallbackHTML(tipo = "card") {
+    const testo = "Anteprima non disponibile";
+    if (tipo === "modal") {
+      return `<div class="modal-img-wrap"><div class="img-fallback" style="height:220px;">${testo}</div></div>`;
+    }
+    return `<div class="img-fallback">${testo}</div>`;
+  }
+
+  /* ✅ handler per immagini rotte: sostituisce il contenitore */
+  function handleImgError(imgEl, tipo = "card") {
+    const parent = imgEl?.parentElement;
+    if (!parent) return;
+    parent.innerHTML = imgFallbackHTML(tipo);
+  }
+
   /* === MODAL PRODOTTO === */
   function apriModal(prodotto) {
     const modal = document.getElementById("modalProdotto");
@@ -383,7 +456,14 @@
     const n = prodotto.normalizzato;
 
     content.innerHTML = `
-      <img src="${n.percorsoImmagine}" onclick="apriFullscreen(this.src)" style="cursor: zoom-in;">
+      <div class="modal-img-wrap">
+        <img src="${n.percorsoImmagine}"
+             loading="lazy"
+             onclick="apriFullscreen(this.src)"
+             onerror="handleImgError(this,'modal')"
+             style="cursor: zoom-in;">
+      </div>
+
       <h4 style="color:white; margin-bottom:5px;">${n.codice}</h4>
       <p style="color:#ccc;">${n.descrizione || ""}</p>
 
@@ -394,8 +474,6 @@
         <div><strong>Interno Filo:</strong> ${n.internoFilo}</div>
         <div><strong>Dim. Filo:</strong> ${n.spessore}</div>
         <div><strong>Peso:</strong> ${n.peso} g</div>
-
-        <!-- ⭐️ NUOVO -->
         <div><strong>Lavorazioni:</strong> ${n.lavorazioni || "Nessuna"}</div>
       </div>
 
@@ -421,8 +499,12 @@
         <div class="col-md-6 col-lg-4 col-xl-3">
           <div class="card-prodotto" onclick='apriModal(${JSON.stringify(prodotto).replace(/"/g, "&quot;")})'>
             <div class="prodotto-image">
-              <img src="${n.percorsoImmagine}" style="width:100%; height:120px; object-fit:cover; border-radius:8px;">
+              <img src="${n.percorsoImmagine}"
+                   loading="lazy"
+                   onerror="handleImgError(this,'card')"
+                   style="width:100%; height:120px; object-fit:cover; border-radius:8px;">
             </div>
+
             <div class="prodotto-codice">${n.codice}</div>
             <div class="prodotto-descrizione">${n.descrizione || ""}</div>
 
@@ -433,8 +515,6 @@
               <div><strong>Interno Filo:</strong> ${n.internoFilo}</div>
               <div><strong>Dim. Filo:</strong> ${n.spessore}</div>
               <div><strong>Peso:</strong> ${n.peso} g</div>
-
-              <!-- ⭐️ NUOVO -->
               <div><strong>Lavorazioni:</strong> ${n.lavorazioni || "—"}</div>
             </div>
           </div>
